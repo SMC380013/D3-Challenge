@@ -3,7 +3,7 @@
 const svgWidth = 960;
 const svgHeight = 500;
 
-// // Define the chart's margins as an object
+// Define the chart's margins as an object
 
 const margin = {
   top: 20,
@@ -12,32 +12,32 @@ const margin = {
   left: 100
 };
 
-// // Define dimensions of the chart area
+// Define dimensions of the chart area
 const chartWidth = svgWidth - margin.left - margin.right;
 const chartHeight = svgHeight - margin.top - margin.bottom;
 
-// // Select body, append SVG area to it, and set its dimensions
+// Select body, append SVG area to it, and set its dimensions
 var svg = d3.select("#scatter")
   .append("svg")
   .attr("width", svgWidth)
   .attr("height", svgHeight);
 
-// // Append a group area, then set its margins
+// Append a group area, then set its margins
 var chartGroup = svg.append("g")
   .attr("transform", `translate(${margin.left}, ${margin.top})`);
 
 // Load data from data.csv
 // d3.csv("../data/data.csv", function(error, Data) {
-d3.csv('data.csv').then(function (data, error) {
+d3.csv('/data.csv').then(function (data) {
   // Throw an error if one occurs
-  if (error) throw error;
+  // if (error) throw error;
 
   // Print the forceData
-  console.log(Data);
+  console.log(data);
 });
 
 // Parse Data/Cast as numbers
-// ==============================
+
 data.forEach((data) => {
   data.poverty = +data.poverty;
   data.healthcare = +data.healthcare;
@@ -46,18 +46,18 @@ data.forEach((data) => {
 // Configure a time scale
 // d3.extent returns the an array containing the min and max values for the property specified
 let xLinearScale = d3.scaleLinear()
-  .domain(d3.extent(Data, data => data.poverty))
+  .domain(d3.extent(data, data => data.poverty))
   .range([0, chartWidth]);
 
 
 // Configure a linear scale with a range between the chartHeight and 0
 let yLinearScale = d3.scaleLinear()
-  .domain([0, d3.extent(Data, data => data.healthcare)])
+  .domain([0, d3.extent(data, data => data.healthcare)])
   .range([chartHeight, 0]);
 
 
-//     // Create two new functions passing the scales in as arguments
-//     // These will be used to create the chart's axes
+//  Create two new functions passing the scales in as arguments
+//  These will be used to create the chart's axes
 let bottomAxis = d3.axisBottom(xLinearScale);
 let leftAxis = d3.axisLeft(yLinearScale);
 
@@ -71,7 +71,7 @@ chartGroup.append("g")
   .call(yAxis);
 
 // Create Circles
-// ==============================
+
 let circlesGroup = chartGroup.selectAll('circle')
   .data(data)
   .enter()
@@ -84,7 +84,7 @@ let circlesGroup = chartGroup.selectAll('circle')
 
 
 // Initialize tool tip
-// ==============================
+
 let toolTip = d3.tip()
   .attr('class', 'tooltip')
   .offset([80, -60])
@@ -93,11 +93,11 @@ let toolTip = d3.tip()
   });
 
 // Create tooltip in the chart
-// ==============================
+
 chartGroup.call(toolTip);
 
 // Create event listeners to display and hide the tooltip
-// ==============================
+
 circlesGroup.on('click', function (data) {
   toolTip.show(data, this);
 })
@@ -118,6 +118,6 @@ chartGroup.append("text")
   .attr("transform", `translate(${width / 2}, ${height + margin.top + 30})`)
   .attr("class", "axisText")
   .text("In Poverty (%)");
-});
+
 
 
