@@ -33,46 +33,50 @@ d3.csv('/data.csv').then(function (data) {
   // if (error) throw error;
 
   // Print the forceData
+  // console.log(data);
+  data.forEach((data) => {
+    data.poverty = +data.poverty;
+    data.healthcare = +data.healthcare;
+
+  });
   console.log(data);
-});
-
-// Parse Data/Cast as numbers
-
-data.forEach((data) => {
-  data.poverty = +data.poverty;
-  data.healthcare = +data.healthcare;
-});
-
-// Configure a time scale
-// d3.extent returns the an array containing the min and max values for the property specified
-let xLinearScale = d3.scaleLinear()
+  
+  // const poverty = data.map(phdata => phdata.poverty);
+  // const healthcare = data.map(phdata => phdata.healthcare);
+  
+  // Parse Data/Cast as numbers
+  
+  
+  // Configure a time scale
+  // d3.extent returns the an array containing the min and max values for the property specified
+  let xLinearScale = d3.scaleLinear()
   .domain(d3.extent(data, data => data.poverty))
   .range([0, chartWidth]);
-
-
-// Configure a linear scale with a range between the chartHeight and 0
-let yLinearScale = d3.scaleLinear()
-  .domain([0, d3.extent(data, data => data.healthcare)])
+  
+  
+  // Configure a linear scale with a range between the chartHeight and 0
+  let yLinearScale = d3.scaleLinear()
+  .domain(d3.extent(data, data => data.healthcare))
   .range([chartHeight, 0]);
-
-
-//  Create two new functions passing the scales in as arguments
-//  These will be used to create the chart's axes
-let bottomAxis = d3.axisBottom(xLinearScale);
-let leftAxis = d3.axisLeft(yLinearScale);
-
-// set x to the bottom of the chart
-chartGroup.append("g")
+  
+  
+  //  Create two new functions passing the scales in as arguments
+  //  These will be used to create the chart's axes
+  let bottomAxis = d3.axisBottom(xLinearScale);
+  let leftAxis = d3.axisLeft(yLinearScale);
+  
+  // set x to the bottom of the chart
+  chartGroup.append("g")
   .attr("transform", `translate(0, ${chartHeight})`)
-  .call(xAxis);
-
-// set y to the y axis
-chartGroup.append("g")
-  .call(yAxis);
-
-// Create Circles
-
-let circlesGroup = chartGroup.selectAll('circle')
+  .call(bottomAxis);
+  
+  // set y to the y axis
+  chartGroup.append("g")
+  .call(leftAxis);
+  
+  // Create Circles
+  
+  let circlesGroup = chartGroup.selectAll('circle')
   .data(data)
   .enter()
   .append('circle')
@@ -81,43 +85,53 @@ let circlesGroup = chartGroup.selectAll('circle')
   .attr('r', 15)
   .attr('fill', 'blue')
   .attr('opacity', '.5');
+  
+  svg.selectAll("text")
+       .data(data)
+       .enter()
+       .append("text")
+       // Add your code below this line
+       .attr("dx",data => xLinearScale(data.poverty)+95)
+       .attr("dy",data => yLinearScale(data.healthcare)+25)
+       .text((data)=> data.abbr)
 
-
-// Initialize tool tip
-
-let toolTip = d3.tip()
-  .attr('class', 'tooltip')
-  .offset([80, -60])
-  .html((data) => {
-    return `${data.abbr}`;
-  });
-
-// Create tooltip in the chart
-
-chartGroup.call(toolTip);
-
-// Create event listeners to display and hide the tooltip
-
-circlesGroup.on('click', function (data) {
-  toolTip.show(data, this);
-})
-  .on('mouseout', function (data, index) {
-    toolTip.hide(data);
-  });
-
-// Create axes labels
-chartGroup.append("text")
+  // Initialize tool tip
+  
+  // let toolTip = d3.tip()
+  // .attr('class', 'tooltip')
+  // .offset([0, -0])
+  // .html((data) => {
+  //   return `${data.abbr}`;
+  // });
+  
+  // // Create tooltip in the chart
+  
+  // chartGroup.call(toolTip);
+  
+  // // Create event listeners to display and hide the tooltip
+  
+  // circlesGroup.on('click', function (data) {
+  //   toolTip.show(data, this);
+  // })
+  // .on('mouseout', function (data, index) {
+  //   toolTip.hide(data);
+  // });
+  
+  // Create axes labels
+  chartGroup.append("text")
   .attr("transform", "rotate(-90)")
   .attr("y", 0 - margin.left + 40)
-  .attr("x", 0 - (height / 2))
+  .attr("x", 0 - (chartHeight / 2))
   .attr("dy", "1em")
   .attr("class", "axisText")
   .text("Lacks Healthcare (%)");
-
-chartGroup.append("text")
-  .attr("transform", `translate(${width / 2}, ${height + margin.top + 30})`)
+  
+  chartGroup.append("text")
+  .attr("transform", `translate(${chartWidth / 2}, ${chartHeight + margin.top + 30})`)
   .attr("class", "axisText")
   .text("In Poverty (%)");
-
-
-
+  
+  
+});
+  
+  
